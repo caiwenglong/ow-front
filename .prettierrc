@@ -1,0 +1,9 @@
+{
+  "tabWidth": 2,
+  "comment1": "===== 默认使用双引号，设置为true改为单引号 ====",
+  "singleQuote": true,
+  "comment2": "===== 默认在后面需要分号结束，设置为false ====",
+  "semi": false,
+  "comment3": "===== 默认在script和style标签下不能有空格，设置为true设置缩进两格 ====",
+  "vueIndentScriptAndStyle": true
+}
