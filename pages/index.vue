@@ -7,26 +7,35 @@
       <div class="">
         <div class="search-input">
           <el-autocomplete
-            v-model="state"
+            v-model="keyword"
             placeholder="请输入网站名称并回车搜索"
             suffix-icon="el-icon-search"
             :fetch-suggestions="querySearchAsync"
             :trigger-on-focus="false"
             :highlight-first-item="true"
+            :hide-loading="true"
+            :value-key="valueKey"
             @select="handleSelect"
           >
             <template slot-scope="{ item }">
-              <a class="ow-item" :href="item.url">
-                <span class="ow-name" v-html="item.name" />
-                <span class="ow-name">：</span>
-                <span class="ow-addr">{{ item.url }}</span>
-                <span class="ow-tip-direct">直接跳转到该网站的官网</span>
-              </a>
+              <template v-if="item.isEmptyTip">
+                <span class="ow-name" v-html="item.value" />
+              </template>
+              <template v-else>
+                <a class="ow-item" :href="item.url">
+                  <span class="ow-name" v-html="item.name" />
+                  <span class="ow-name">：</span>
+                  <span class="ow-addr">{{ item.url }}</span>
+                  <span v-if="item.url" class="ow-tip-direct">
+                    直接跳转到该网站的官网
+                  </span>
+                </a>
+              </template>
             </template>
           </el-autocomplete>
         </div>
         <div class="search-btn">
-          <el-button type="primary">搜一下</el-button>
+          <el-button type="primary" @click="querySearchAsync">搜一下</el-button>
         </div>
       </div>
     </div>
@@ -37,28 +46,38 @@
   import axios from 'axios'
   export default {
     data() {
+      const emptyResponseTip = [
+        { value: '没有搜索到数据，请输入其他名称', isEmptyTip: true }
+      ]
       return {
-        state: '',
+        keyword: '',
+        valueKey: 'name',
         websiteList: [],
-        timeout: null
+        timeout: null,
+        emptyResponseTip
       }
     },
     methods: {
       querySearchAsync(queryString, cb) {
+        const _this = this
         axios
           .get(
             `http://localhost:8001/uInterface/tb-website/find/${queryString}/1/10`
           )
           .then(res => {
             if (res.data.isSuccess && res.data.code === 'OW20000') {
-              this.websiteList = res.data.data.websiteArrayList
-              debugger
-              cb(this.websiteList)
+              _this.websiteList = res.data.data.websiteArrayList
+              if (_this.websiteList.length > 0) {
+                cb(_this.websiteList)
+              } else {
+                cb(_this.emptyResponseTip)
+              }
             }
           })
       },
       handleSelect(item) {
-        console.log(item)
+        this.keyword = item.name.replace(/<\/?.+?\/?>/g, '')
+        window.open(item.url, '_blank')
       }
     }
   }
