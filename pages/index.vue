@@ -11,7 +11,7 @@
             placeholder="请输入网站名称并回车搜索"
             suffix-icon="el-icon-search"
             :fetch-suggestions="querySearchAsync"
-            :trigger-on-focus="false"
+            :trigger-on-focus="true"
             :highlight-first-item="true"
             :hide-loading="true"
             :value-key="valueKey"
@@ -22,20 +22,17 @@
                 <span class="ow-name" v-html="item.value" />
               </template>
               <template v-else>
-                <a class="ow-item" :href="item.url">
+                <span class="ow-item">
                   <span class="ow-name" v-html="item.name" />
                   <span class="ow-name">：</span>
                   <span class="ow-addr">{{ item.url }}</span>
                   <span v-if="item.url" class="ow-tip-direct">
                     直接跳转到该网站的官网
                   </span>
-                </a>
+                </span>
               </template>
             </template>
           </el-autocomplete>
-        </div>
-        <div class="search-btn">
-          <el-button type="primary" @click="querySearchAsync">搜一下</el-button>
         </div>
       </div>
     </div>
@@ -77,6 +74,7 @@
       },
       handleSelect(item) {
         this.keyword = item.name.replace(/<\/?.+?\/?>/g, '')
+        console.log(item.url)
         window.open(item.url, '_blank')
       }
     }
